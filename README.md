@@ -2,9 +2,9 @@
 
 _Last updated: 2021-04-18_ (commit `beafd11`)
 
-This is the at-a-glance overview diagrams of [Apache Lucene](https://lucene.apache.org/)'s default `PostingsFormat`, which encodes inverted indices into low-level binary format, written for advanced users.
+This is the at-a-glance overview diagrams of [Apache Lucene](https://lucene.apache.org/)'s default `PostingsFormat`, which encodes inverted indices into low-level binary format, written for advanced users (and myself).
 
-**NOTE:** The contents is NOT related to any Lucene release versions but specific revisions (commits). It will be updated on an irregular basis, also very fine details are often omitted. Please refer the official documentation or source code (the latter is the best) for more detailed and/or up-to-date information.
+**NOTE:** The contents are NOT related to any Lucene release versions but specific revisions (commits). It will be updated on an irregular basis, also very fine details are often omitted. Please refer the official documentation or source code (the latter is the best) for more detailed and/or up-to-date information.
 
 ## Overview
 
