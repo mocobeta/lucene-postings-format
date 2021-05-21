@@ -2,9 +2,9 @@
 
 _Last updated: 2021-04-18_ (commit `beafd11`)
 
-This is an at-a-glance overview diagram of [Apache Lucene](https://lucene.apache.org/)'s default `PostingsFormat`, which encodes inverted indices into low-level binary format, written for advanced users (and myself).
+This is an at-a-glance overview of [Apache Lucene](https://lucene.apache.org/)'s default `PostingsFormat`, which encodes inverted indices into low-level binary format, written for advanced users (and myself).
 
-**NOTE:** The contents are NOT related to any Lucene release versions but specific revisions (commits). It will be updated on an irregular basis, also very fine details are often omitted. Please refer the official documentation or source code (the latter is the best) for more detailed and/or up-to-date information.
+**NOTE:** The contents are NOT related to any Lucene release version but specific revision (commit). It will be updated on an irregular basis, also very fine details are often omitted. Please refer the official documentation or source code (the latter is the best) for more detailed and/or up-to-date information.
 
 ## Overview
 
@@ -123,7 +123,7 @@ Overview of the term dictionary format. (.tim file)
 
 - SingletonCount (`VInt`) : Number of singleton terms (having DF==1, TTF==1) preceding the term.
 - DocFreq (`VInt`) : Document frequency of the term.
-- TotalTermFreq (`VLong`) : Total term frequency of the term.
+- TotalTermFreq (`VLong`) : Total term frequency of the term; ommitted when only documents are indexed.
 
 ### TermMetadata
 
@@ -194,6 +194,7 @@ Overview of the document and term frequencies file format. (.doc file)
 
 - SkipLevelLength (`VLong`) : The length of following SkipLevel.
 - [SkipLevel](#skiplevel)
+- [SkipDatum](#skipdatum) : Skip datum for level 0.
 
 ### SkipLevel
 
@@ -253,7 +254,7 @@ Overview of the positions file format. (.pos file)
 ```
 
 - Header (`CodecHeader`)
-- [TermPositions](#termpositions) : The term positions data that composed of fixed-size block compressed part and residual part.
+- [TermPositions](#termpositions) : The term positions data that composes of fixed-size block compressed part and residual part.
 - Footer (`CodecFooter`)
 
 ### TermPositions
@@ -278,7 +279,7 @@ Overview of the positions file format. (.pos file)
 
 - PosDelta (`VInt`) : Position delta.
 - PayloadLength (`VInt`) : The length of following Payload; omitted when payloads are not indexed.
-- Payload (`Bytes`) : Payload data.
+- Payload (`Bytes`) : Payload data; ommitted when payloads are not indexed.
 - OffsetDelta (`VInt`) : Start offset delta; omitted when offsets are not indexed.
 - OffsetLength (`VInt`) : The length of the offset (end offset - start offset); omitted when offsets are not indexed.
 
@@ -295,8 +296,8 @@ Overview of the payloads and offsets file format. (.pay file)
 ```
 
 - Header (`CodecHeader`)
-- [TermPayloads](#termpayloads) : Payload data.
-- [TermOffsets](#termoffsets) : Offsets data.
+- [TermPayloads](#termpayloads) : Payload data; ommitted when payloads are not indexed.
+- [TermOffsets](#termoffsets) : Offsets data; omitted when offsets are not indexed.
 - Footer (`CodecFooter`)
 
 ### TermPayloads
