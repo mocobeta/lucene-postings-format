@@ -1,22 +1,22 @@
-# Lucene PostingsFormat At-a-Glance
+# Lucene PostingsFormat 概観図
 
-English / [日本語](./README_ja.md)
+[English](./README.md) / 日本語
 
-_Last updated: 2021-04-18_ (commit `beafd11`)
+_Last updated: 2021-06-05_ (commit `beafd11`)
 
-This is an at-a-glance overview of [Apache Lucene](https://lucene.apache.org/)'s default `PostingsFormat`, which encodes inverted indices into low-level binary format, written for advanced users (and myself).
+これは，[Apache Lucene](https://lucene.apache.org/) のデフォルト `PostingsFormat` - 転置インデックスをバイナリエンコードした，低レベル表現 - の概観図で，上級ユーザー（また，著者自身）に向けて書かれたものです。
 
-**NOTE:** The contents are NOT related to any Lucene release version but specific revision (commit). It will be updated on an irregular basis, also very fine details are often omitted. Please refer the official documentation or source code (the latter is the best) for more detailed and/or up-to-date information.
+**NOTE:** 以下のコンテンツは，どのLuceneリリースバージョンとも対応するものではなく，ソースコードリポジトリの特定のリビジョン（コミット）と紐づいています。更新は不定期に行われ，また細部はしばしば省略されています。より詳細や最新の情報については，公式ドキュメントないしソースコード（後者がベストです）を参照してください。
 
-## Overview
+## 概要
 
-Basically, `PostingsFormat` (i.e., inverted index) composes of two components: term dictionary and postings list.
+`PostingsFormat` （転置インデックス）はおおまかに，2つのコンポーネント - ターム辞書とポスティングスリスト - から構成されます。
 
-1. Term dictionary composes of:
+1. ターム辞書はさらに，これらのファイルから構成されます:
    - .tmd file [Term Metadata](#term-metadata)
    - .tim file [Term Dictionary](#term-dictionary)
    - .tip file [Term Index](#term-index)
-2. Postings list composes of:
+2. ポスティングスリストはさらに，これらのファイルから構成されます:
    - .doc file [Frequencies and Skip data](#frequencies-and-skip-data)
    - .pos file [Positions](#positions)
    - .pay file [Payloads and Offsets](#payloads-and-offsets)
@@ -24,7 +24,7 @@ Basically, `PostingsFormat` (i.e., inverted index) composes of two components: t
 
 ## Term Metadata
 
-Overview of the term metadata format (.tmd file).
+term metadata フォーマット (.tmd file)
 
 ```
 +--------+-----------+------------+------------+-----+-----------------+----------------+--------+
@@ -34,10 +34,10 @@ Overview of the term metadata format (.tmd file).
 ```
 
 - Header (`CodecHeader`)
-- NumFields (`VInt`) : Numbef of fields in this index.
-- [FieldStats](#fieldstats) : The field level statistics and metadata.
-- TermIndexLength (`Long`) : Whole length of [Term Index](#term-index).
-- TermDictLength (`Long`) : Whole length of [Term Dictionary](#term-dictionary).
+- NumFields (`VInt`) : インデックス中の全フィールド数。
+- [FieldStats](#fieldstats) : フィールドレベルの統計情報とメタデータ。
+- TermIndexLength (`Long`) : このインデックスの [Term Index](#term-index) 長さ総和。
+- TermDictLength (`Long`) : このインデックスの [Term Dictionary](#term-dictionary) 長さ総和。
 - Footer (`CodecFooter`)
 
 ### FieldStats
@@ -56,25 +56,25 @@ Overview of the term metadata format (.tmd file).
 --+--------------+-----------+-------------+
 ```
 
-- FieldNumber (`VInt`) : Field number.
-- NumTerms (`VLong`) : Number of unique terms for the field.
-- RootCodeLength (`VInt`): The length of following RootCode.
+- FieldNumber (`VInt`) : フィールド番号。
+- NumTerms (`VLong`) : フィールド中のターム異なり数。
+- RootCodeLength (`VInt`): 後続のRootCodeの長さ。
 - RootCode (`Bytes`) : 
-- SumTotalTermFreq (`VLong`): Sum of total term frequencies; omitted when only documents are indexed.
-- SumDocFreq (`VLong`) : Sum of document frequencies for terms in the field.
-- DocCount (`VInt`) : Number of documents which have the field.
-- MinTermLength (`VInt`) : The length of following MinTerm.
-- MinTerm (`Bytes`): Minimum (first) term for the field.
-- MaxTermLength (`VInt`): The length of following MaxTerm.
-- MaxTerm (`Bytes`): Maximum (last) term for the field.
-- IndexStartFP (`VLong`): The file pointer to [Term Index](#term-index) for the field.
+- SumTotalTermFreq (`VLong`): ターム出現頻度（TF）の総和。ドキュメントIDのみインデックスする時は省略される。
+- SumDocFreq (`VLong`) : ドキュメント頻度（DF）の総和。
+- DocCount (`VInt`) : このフィールドをもつドキュメント数。
+- MinTermLength (`VInt`) : 後続のMinTermの長さ。
+- MinTerm (`Bytes`): このフィールドに含まれる最小（最初）のターム。
+- MaxTermLength (`VInt`): 後続のMaxTermの長さ。
+- MaxTerm (`Bytes`): このフィールドに含まれる最大（最後）のターム。
+- IndexStartFP (`VLong`): このフィールドに対応する， [Term Index](#term-index) へのファイルポインタ。
 - FSTHeader (`CodecHeader`)
 - FSTMetadata
 
 
 ## Term Dictionary
 
-Overview of the term dictionary format. (.tim file)
+term dictionary フォーマット (.tim file)
 
 ```
 +--------+-----------+-----------+-----------+-----+--------+
@@ -84,7 +84,7 @@ Overview of the term dictionary format. (.tim file)
 ```
 
 - Header (`CodecHeader`)
-- [NodeBlock](#nodeblock) : Block-packed terms data.
+- [NodeBlock](#nodeblock) : ブロック単位にまとめられたタームのデータ。
 - Footer (`CodecFooter`)
 
 ### NodeBlock
@@ -105,14 +105,14 @@ Overview of the term dictionary format. (.tim file)
 --|                |----------------- ( # of terms ) -----------------|
 ```
 
-- BlockHeader (`VInt`) : Block metadata (e.g. number of entries the block contains).
-- SuffixLength (`VLong`) : The length of following Suffix.
-- Suffix (`Bytes`): Concatenated suffixes for the all terms that are packed in the block.
-- SuffixLengthsLength (`VInt`) : The length of following SuffixLengths.
-- SuffixLengths (`Byte`) or `Bytes`) : The lengths of suffixes of the all terms that are packed in the block.
-- StatsLength (`VInt`) : Total length of following TermStats.
-- [TermStats](#termstats) : The term level statistics.
-- MetaLength (`VInt`) : Total length of following TermMetadata.
+- BlockHeader (`VInt`) : このブロックのメタデータ（例：ブロックが含むターム数）
+- SuffixLength (`VLong`) : 後続のSuffixの長さ。
+- Suffix (`Bytes`): このブロックに含まれる，すべてのタームのサフィックスを結合したバイト列。
+- SuffixLengthsLength (`VInt`) : 後続のSuffixLengthsの長さ。
+- SuffixLengths (`Byte`) or `Bytes`) : このブロックに含まれる，すべてのタームのサフィックス長のリスト。
+- StatsLength (`VInt`) : 後続のTermStatsの長さ。
+- [TermStats](#termstats) : タームレベルの統計情報。
+- MetaLength (`VInt`) : 後続のTermMetadataの長さ。
 - [TermMetadata](#termmetadata)
 
 ### TermStats
@@ -123,9 +123,9 @@ Overview of the term dictionary format. (.tim file)
 +-----------------+---------+----------------+
 ```
 
-- SingletonCount (`VInt`) : Number of singleton terms (having DF==1, TTF==1) preceding the term.
-- DocFreq (`VInt`) : Document frequency of the term.
-- TotalTermFreq (`VLong`) : Total term frequency of the term; ommitted when only documents are indexed.
+- SingletonCount (`VInt`) : このタームの前に出現する，シングルトンターム(DF==1, TTF==1)の数.
+- DocFreq (`VInt`) : このタームのドキュメント頻度（DF）。
+- TotalTermFreq (`VLong`) : このタームの総出現頻度。ドキュメントIDのみインデックスするときは省略される。
 
 ### TermMetadata
 
@@ -134,7 +134,8 @@ TBD
 
 ## Term Index
 
-Overview of the term index file format. (.tip file)
+term index フォーマット (.tip file)
+
 
 ```
 +--------+----------+----------+----------+-----+--------+
@@ -144,13 +145,13 @@ Overview of the term index file format. (.tip file)
 ```
 
 - Header (`CodecHeader`)
-- FSTIndex (`Bytes`) : Binary encoded fst index for a field.
+- FSTIndex (`Bytes`) : フィールドごとの，バイナリエンコードされたFSTインデックス。
 - Footer (`CodecFooter`)
 
 
 ## Frequencies and Skip data
 
-Overview of the document and term frequencies file format. (.doc file)
+document and term frequencies フォーマット (.doc file)
 
 ```
 +--------+------------------------+------------------------+-----+--------+
@@ -160,8 +161,8 @@ Overview of the document and term frequencies file format. (.doc file)
 ```
 
 - Header (`CodecHeader`)
-- [TermFreqs](#termfreqs) : The document id deltas and term frequencies.
-- [SkipData](#skipdata) : The skip list data for faster retrieval.
+- [TermFreqs](#termfreqs) : ドキュメントIDの差分列とターム出現頻度。
+- [SkipData](#skipdata) : 高速な検索のための，スキップリストデータ。
 - Footer (`CodecFooter`)
 
 
@@ -180,10 +181,10 @@ Overview of the document and term frequencies file format. (.doc file)
 
 ```
 
-- PackedDocDelta (`PackedInts`) : Block compressed document id deltas in each block.
-- PackedFreq (`PackedInts`) : Block compressed term frequency deltas in each block; omitted when term frequencies are not indexed.
-- DocDelta (`VInt`) : Document id delta.
-- Freq (`VInt`) : Term frequency delta; omitted when term frequencies are not indexed.
+- PackedDocDelta (`PackedInts`) : ブロック圧縮されたドキュメントIDの差分列。
+- PackedFreq (`PackedInts`) : ブロック圧縮されたターム出現頻度（TF）の差分列。ターム出現頻度をインデックスしない時は省略される。
+- DocDelta (`VInt`) : ドキュメントIDの差分。
+- Freq (`VInt`) : ターム出現頻度（TF）の差分。ターム出現頻度をインデックスしない時は省略される。
 
 ### SkipData
 
@@ -194,9 +195,9 @@ Overview of the document and term frequencies file format. (.doc file)
 |------------------- ( # of skip levels - 1 ) ----------------------|
 ```
 
-- SkipLevelLength (`VLong`) : The length of following SkipLevel.
+- SkipLevelLength (`VLong`) : 後続のSkipLevelの長さ。
 - [SkipLevel](#skiplevel)
-- [SkipDatum](#skipdatum) : Skip datum for level 0.
+- [SkipDatum](#skipdatum) : レベル0のスキップデータ。
 
 ### SkipLevel
 
@@ -208,7 +209,7 @@ Overview of the document and term frequencies file format. (.doc file)
 ```
 
 - [SkipDatum](#skipdatum)
-- ChildSkipLevelFP (`VLong`) : The file pointer of its direct child skip level data.
+- ChildSkipLevelFP (`VLong`) : 子スキップレベルデータへのファイルポインタ。
 
 ### SkipDatum
 
@@ -223,14 +224,14 @@ Overview of the document and term frequencies file format. (.doc file)
                  |------- ( # of impacts ) -------|
 ```
 
-- SkipDocDelta (`VInt`) : The last document id delta in each block.
-- SkipDocFPDelta (`VLong`) : The file pointer of each block in .doc file.
-- SkipPosFPDelta (`VLong`) : The file pointer of each related block in .pos file; omitted when positions are not indexed.
-- SkipPosBlockOffset (`VInt`) : The offset value inside the related block in .pos file; omitted when positions are not indexed.
-- SkipPayBlockLength (`VInt`) : The sum of the payload lengths of each related block in .pay file; omitted when payloads are not indexed.
-- SkipPayFPDelta (`VLong`) : The file pointer of each related block in .pay file; omitted when offsets/payloads are not indexed.
-- ImpactLength (`VInt`) : The total length of following Impacts.
-- [Impact](#impact) : The competitive frequency and norm data for faster top-k retrieval.
+- SkipDocDelta (`VInt`) : このブロックに含まれる，最後のドキュメントID（差分）。
+- SkipDocFPDelta (`VLong`) : このブロックに対応する .doc ファイルへのファイルポインタ。
+- SkipPosFPDelta (`VLong`) : このブロックに対応する .pos ファイルへのファイルポインタ。ターム出現位置をインデックスしない時は省略される。
+- SkipPosBlockOffset (`VInt`) : このブロックに対応する .pos ファイル中のオフセット値。ターム出現位置をインデックスしない時は省略される。
+- SkipPayBlockLength (`VInt`) : このブロックに対応する .pay ファイル中のタームペイロード長さ総和。ペイロードをインデックスしない時は省略される。
+- SkipPayFPDelta (`VLong`) : このブロックに対応する .pay ファイルへのファイルポインタ。ペイロードをインデックスしない時は省略される。
+- ImpactLength (`VInt`) : 後続のImpactsの長さ。
+- [Impact](#impact) : 高速なTop-k検索のための付加データ（competitive frequency and norm data）。
 
 ### Impact
 
@@ -246,7 +247,7 @@ Overview of the document and term frequencies file format. (.doc file)
 
 ## Positions
 
-Overview of the positions file format. (.pos file)
+positions フォーマット (.pos file)
 
 ```
 +--------+---------------+---------------+---------------+-----+--------+
@@ -256,7 +257,7 @@ Overview of the positions file format. (.pos file)
 ```
 
 - Header (`CodecHeader`)
-- [TermPositions](#termpositions) : The term positions data that composes of fixed-size block compressed part and residual part.
+- [TermPositions](#termpositions) : ターム位置情報。固定ブロックサイズに圧縮されたパートと，その余剰パートからなる。
 - Footer (`CodecFooter`)
 
 ### TermPositions
@@ -268,8 +269,8 @@ Overview of the positions file format. (.pos file)
 |---------- ( # of pos blocks ) --------|------- ( # of remaining positions ) ------|
 ```
 
-- PackedPosDelta (`PackedInts`) : Block compressed position deltas in each block.
-- [ResidualPosDelta](#residualposdelta) : The residual position deltas that are encoded as `VInt`.
+- PackedPosDelta (`PackedInts`) : ブロック圧縮されたターム出現位置情報の差分列。
+- [ResidualPosDelta](#residualposdelta) : `VInt` でエンコードされた余剰のターム出現位置情報。
 
 ### ResidualPosDelta
 
@@ -279,16 +280,16 @@ Overview of the positions file format. (.pos file)
 +----------+----------------+----------+--------------+---------------+
 ```
 
-- PosDelta (`VInt`) : Position delta.
-- PayloadLength (`VInt`) : The length of following Payload; omitted when payloads are not indexed.
-- Payload (`Bytes`) : Payload data; ommitted when payloads are not indexed.
-- OffsetDelta (`VInt`) : Start offset delta; omitted when offsets are not indexed.
-- OffsetLength (`VInt`) : The length of the offset (end offset - start offset); omitted when offsets are not indexed.
+- PosDelta (`VInt`) : ターム出現位置（差分）。
+- PayloadLength (`VInt`) : 後続のPayloadの長さ。ペイロードをインデックスしない時は省略される。
+- Payload (`Bytes`) : ペイロードデータ。ペイロードをインデックスしない時は省略される。
+- OffsetDelta (`VInt`) : 開始文字オフセット（差分）。文字オフセットをインデックスしない時は省略される。
+- OffsetLength (`VInt`) : 文字オフセット長（終了文字オフセットから開始文字オフセットを引いたもの）。 文字オフセットをインデックスしない時は省略される。
 
 
 ## Payloads and Offsets
 
-Overview of the payloads and offsets file format. (.pay file)
+payloads and offsets フォーマット (.pay file)
 
 ```
 +--------+-------------------------------+------------------------------+-----+--------+
@@ -298,8 +299,8 @@ Overview of the payloads and offsets file format. (.pay file)
 ```
 
 - Header (`CodecHeader`)
-- [TermPayloads](#termpayloads) : Payload data; ommitted when payloads are not indexed.
-- [TermOffsets](#termoffsets) : Offsets data; omitted when offsets are not indexed.
+- [TermPayloads](#termpayloads) : ペイロードデータ。ペイロードをインデックスしない時は省略される。
+- [TermOffsets](#termoffsets) : 文字オフセットデータ。文字オフセットをインデックスしない時は省略される。
 - Footer (`CodecFooter`)
 
 ### TermPayloads
@@ -311,9 +312,9 @@ Overview of the payloads and offsets file format. (.pay file)
 |------------------------------------------- ( # of pos blocks ) -------------------------------------------------------|
 ```
 
-- PackedPayloadLengths (`PackedInts`) : Block compressed payload lengths in each block.
-- SumPayloadLengths (`VInt`) : The sum of payload lengths in each block.
-- PayloadData (`Bytes`) : Concatenated payload data in each block.
+- PackedPayloadLengths (`PackedInts`) : ブロック圧縮された，ペイロード長さのリスト。
+- SumPayloadLengths (`VInt`) : このブロック中のペイロード長さ総和。
+- PayloadData (`Bytes`) : このブロック中のすべてのペイロードを結合したバイト列。
 
 ### TermOffsets
 
@@ -324,5 +325,5 @@ Overview of the payloads and offsets file format. (.pay file)
 |----------------------------------- ( # of pos blocks ) -----------------------------------|
 ```
 
-- PackedOffsetDelta (`PackedInts`) : Block compressed start offset deltas in each block.
-- PackedOffsetLengths (`PackedInts`) : Block compressed offset lengths (end offset - start offset) in each block.
+- PackedOffsetDelta (`PackedInts`) : ブロック圧縮された開始文字オフセットの差分列。
+- PackedOffsetLengths (`PackedInts`) : ブロック圧縮された文字オフセット長（終了文字オフセットから開始文字オフセットを引いたもの）のリスト。
