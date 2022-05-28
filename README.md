@@ -2,7 +2,7 @@
 
 English / [日本語](./README_ja.md)
 
-_Last updated: 2021-04-18_ (commit `beafd11`)
+_Last updated: 2022-05-28_ (commit `f5c1f11`)
 
 This is an at-a-glance overview of [Apache Lucene](https://lucene.apache.org/)'s default `PostingsFormat`, which encodes inverted indices into low-level binary format, written for advanced users (and myself).
 
@@ -129,7 +129,22 @@ Overview of the term dictionary format. (.tim file)
 
 ### TermMetadata
 
-TBD
+```
++------------+-----------------+-------------+-------------+---------------------
+| DocStartFP | SingletonDocID? | PosStartFP? | PayStartFP? | LastPosBlockOffset?
++------------+-----------------+-------------+-------------+---------------------
+
+--+-------------+
+  | SkipOffset? |
+--+-------------+
+```
+
+- DocStartFP (`VLong`) : The file pointer to the start of the doc ids for this term in .doc file
+- SingletonDocID (`VInt`) : Document id if there is only one posting for the term.
+- PosStartFP (`VLong`) : The file pointer to the start of the positions for this term in .pos file; omitted when positions are not indexed.
+- PayStartFP (`VLong`) : The file pointer to the start of the payloads for this term in .pay file; omitted when neither offsets nor payloads are indexed.
+- LastPosBlockOffset (`VLong`) : The file offset for the last position for the last block; omitted when there are less positions than the block size.
+- SkipOffset (`VLong`) : The relative file offset for the start of the skip list to DocStartFP; omitted when there are less docs than the block size.
 
 
 ## Term Index
