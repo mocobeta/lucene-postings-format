@@ -10,7 +10,7 @@ These diagrams describe the relationship between the classes that play a key rol
 - `IndexingChain`: Default document indexing chain.
 - `IndexingChain.PerField`: Performs indexing for a field.
 - `TermsHash`: Stores indexed tokens in a hash table.
-- `TermsHashPerField`: Stored streams of information per term.
+- `TermsHashPerField`: Stores streams of information per term.
 
 ## Sequence diagram
 
