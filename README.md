@@ -8,6 +8,8 @@ This is an at-a-glance overview of [Apache Lucene](https://lucene.apache.org/)'s
 
 **NOTE:** The contents are NOT related to any Lucene release version but specific revision (commit). It will be updated on an irregular basis, also very fine details are often omitted. Please refer the official documentation or source code (the latter is the best) for more detailed and/or up-to-date information.
 
+If you are also interested in inverted index construction on memory, [Lucene Indexing Chain for Inverted Index](./indexing_chain.md) could be helpful.
+
 ## Overview
 
 Basically, `PostingsFormat` (i.e., inverted index) composes of two components: term dictionary and postings list.
