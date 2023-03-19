@@ -1,6 +1,6 @@
 # Lucene Indexing Chain for Inverted Index
 
-These diagrams describe the relationship between the classes that play a key role in creating inverted indexes. (Note: For brevity, fine details are omitted.)
+These diagrams describe the relationship between the classes that play a key role in creating inverted indexes on memory. (Note: For brevity, fine details are omitted.)
 
 ## Class diagram
 
