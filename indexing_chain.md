@@ -1,6 +1,6 @@
 # Lucene Indexing Chain for Inverted Index
 
-_Last updated: 2023-03-19_ (commit `0782535`)
+_Last updated: 2023-03-25_ (commit `0782535`)
 
 These diagrams describe the relationship between the classes that play a key role in creating inverted indexes on memory. (Note: For brevity, fine details are omitted.)
 
@@ -16,8 +16,14 @@ These diagrams describe the relationship between the classes that play a key rol
 
 ## Sequence diagram
 
+### Index construction on memory
+
 ![](./image/lucene_index_sequence.png)
 
 [1] FreqProxTermsWriter
 
 [2] FreqProxTermsWriterPerField
+
+### Flushing index data to disk
+
+![](./image/lucene_index_flush_sequence.png)
